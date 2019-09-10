@@ -87,16 +87,22 @@ export default {
         .domain([0, d3.max(data.map(e => e.value))])
         .range([chartHeight, 0]);
 
-      const reactGroups = d3
+      const svg = d3
         .select(`#line-chart-${this.id}`)
         .append('svg')
         .attr('width', chartWidth + margin.left + margin.right)
-        .attr('height', chartHeight + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+        .attr('height', chartHeight + margin.top + margin.bottom);
 
-      reactGroups
-        .selectAll('rect')
+      const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+      const yAxisCall = d3.axisLeft(y).tickSize(chartWidth);
+
+      g.append('g')
+        .attr('class', 'y-axis')
+        .call(yAxisCall)
+        .attr('transform', `translate(${chartWidth}, 0)`);
+
+      g.selectAll('rect')
         .data(data)
         .enter()
         .append('rect')
@@ -106,10 +112,37 @@ export default {
         .attr('height', d => chartHeight - y(d.value))
         .attr('fill', '#00BAB6')
         .attr('rx', 3);
+
+      g.selectAll('.label')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr('class', 'label')
+        .attr('x', d => x(d.name) + x.bandwidth() / 2)
+        .attr('y', chartHeight + 15)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', 12)
+        .attr('fill', '#9B9B9B')
+        .text((d, i) => (i % 2 === 0 ? d.name : ''));
     }
   }
 };
 </script>
 
-<style scoped>
+<style>
+.y-axis text {
+  display: none;
+}
+
+.y-axis .domain {
+  display: none;
+}
+
+.y-axis .tick line {
+  stroke: #E8E8E8;
+}
+
+.y-axis .tick:nth-child(even) {
+  display: none;
+}
 </style>
