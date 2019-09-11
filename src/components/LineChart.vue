@@ -107,11 +107,17 @@ export default {
         .enter()
         .append('rect')
         .attr('x', d => x(d.name))
-        .attr('y', d => y(d.value))
+        .attr('y', d => chartHeight)
         .attr('width', x.bandwidth)
-        .attr('height', d => chartHeight - y(d.value))
         .attr('fill', '#00BAB6')
-        .attr('rx', 3);
+        .attr('rx', 3)
+        .attr('height', d => 0)
+        .transition()
+        .duration(750)
+        .delay((d, i) => i * 30)
+        .ease(d3.easeCubic)
+        .attr('height', d => chartHeight - y(d.value))
+        .attr('y', d => y(d.value));
 
       g.selectAll('.label')
         .data(data)
