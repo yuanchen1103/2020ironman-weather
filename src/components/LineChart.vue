@@ -1,5 +1,6 @@
 <template>
-  <div :id="`line-chart-${id}`"></div>
+  <div :id="`line-chart-${id}`"
+       style="position: relative;"></div>
 </template>
 
 <script>
@@ -102,16 +103,17 @@ export default {
         .call(yAxisCall)
         .attr('transform', `translate(${chartWidth}, 0)`);
 
-      g.selectAll('rect')
+      g.selectAll('.bar')
         .data(data)
         .enter()
         .append('rect')
+        .attr('class', 'bar')
         .attr('x', d => x(d.name))
-        .attr('y', d => chartHeight)
+        .attr('y', () => chartHeight)
         .attr('width', x.bandwidth)
         .attr('fill', '#00BAB6')
         .attr('rx', 3)
-        .attr('height', d => 0)
+        .attr('height', 0)
         .transition()
         .duration(750)
         .delay((d, i) => i * 30)
@@ -130,6 +132,48 @@ export default {
         .attr('font-size', 12)
         .attr('fill', '#9B9B9B')
         .text((d, i) => (i % 2 === 0 ? d.name : ''));
+
+      const dashLine = g
+        .append('line')
+        .attr('class', 'dash-line')
+        .attr('y1', 0)
+        .attr('y2', chartHeight)
+        .attr('stroke', '#454545')
+        .attr('stroke-width', 1)
+        .attr('stroke-dasharray', 8)
+        .attr('opacity', '0');
+
+      const messageWrapper = d3
+        .select(`#line-chart-${this.id}`)
+        .append('div')
+        .attr('class', 'message-wrapper')
+        .html('<div class="circle"></div><div class="data"></div>')
+        .attr('style', 'display: none;');
+
+      g.selectAll('.hover-block')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('class', 'hover-block')
+        .attr('width', x.step)
+        .attr('height', chartHeight)
+        .attr('fill', 'transparent')
+        .attr('x', d => x(d.name) - (x.step() - x.bandwidth()) / 2)
+        .on('mouseover', (d, i) => {
+          dashLine
+            .attr('x1', () => x(d.name) + x.bandwidth() / 2)
+            .attr('x2', () => x(d.name) + x.bandwidth() / 2)
+            .attr('opacity', 1);
+
+          d3.select('.message-wrapper .data').html(`${d.value} mm`);
+
+          messageWrapper
+            .attr('style', () => `display: flex; left: ${x(d.name) + 30}px`);
+        })
+        .on('mouseleave', (d, i) => {
+          dashLine.attr('opacity', 0);
+          messageWrapper.attr('style', 'display: none;');
+        });
     }
   }
 };
@@ -145,10 +189,36 @@ export default {
 }
 
 .y-axis .tick line {
-  stroke: #E8E8E8;
+  stroke: #e8e8e8;
 }
 
 .y-axis .tick:nth-child(even) {
   display: none;
+}
+
+.message-wrapper {
+  border-radius: 4px;
+  width: 102px;
+  height: 34px;
+  background: #ffffff;
+  box-shadow: 0 2px 9px 0 rgba(0, 0, 0, 0.09);
+  position: absolute;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.message-wrapper .circle {
+  border-radius: 50%;
+  height: 11px;
+  width: 11px;
+  background-color: #00bab6;
+}
+
+.message-wrapper .data {
+  font-size: 12px;
+  color: #7e7e7e;
+  margin-left: 10px;
 }
 </style>
