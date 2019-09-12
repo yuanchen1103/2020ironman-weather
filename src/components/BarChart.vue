@@ -1,5 +1,5 @@
 <template>
-  <div :id="`line-chart-${id}`"
+  <div :id="`bar-chart-${id}`"
        style="position: relative;"></div>
 </template>
 
@@ -89,7 +89,7 @@ export default {
         .range([chartHeight, 0]);
 
       const svg = d3
-        .select(`#line-chart-${this.id}`)
+        .select(`#bar-chart-${this.id}`)
         .append('svg')
         .attr('width', chartWidth + margin.left + margin.right)
         .attr('height', chartHeight + margin.top + margin.bottom);
@@ -144,7 +144,7 @@ export default {
         .attr('opacity', '0');
 
       const messageWrapper = d3
-        .select(`#line-chart-${this.id}`)
+        .select(`#bar-chart-${this.id}`)
         .append('div')
         .attr('class', 'message-wrapper')
         .html('<div class="circle"></div><div class="data"></div>')
@@ -159,7 +159,7 @@ export default {
         .attr('height', chartHeight)
         .attr('fill', 'transparent')
         .attr('x', d => x(d.name) - (x.step() - x.bandwidth()) / 2)
-        .on('mouseover', (d, i) => {
+        .on('mouseover', (d) => {
           dashLine
             .attr('x1', () => x(d.name) + x.bandwidth() / 2)
             .attr('x2', () => x(d.name) + x.bandwidth() / 2)
@@ -170,7 +170,7 @@ export default {
           messageWrapper
             .attr('style', () => `display: flex; left: ${x(d.name) + 30}px`);
         })
-        .on('mouseleave', (d, i) => {
+        .on('mouseleave', () => {
           dashLine.attr('opacity', 0);
           messageWrapper.attr('style', 'display: none;');
         });
