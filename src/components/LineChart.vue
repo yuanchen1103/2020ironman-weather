@@ -69,8 +69,8 @@ export default {
         }
       ];
       const margin = {
-        top: 0,
-        bottom: 0,
+        top: 20,
+        bottom: 20,
         left: 0,
         right: 0
       };
@@ -99,7 +99,7 @@ export default {
         .line()
         .x((d, i) => x(i))
         .y(d => y(d.value))
-        .curve(d3.curveBasis);
+        .curve(d3.curveNatural);
 
       g.append('path')
         .datum(data)
@@ -114,7 +114,7 @@ export default {
         .x((d, i) => x(i))
         .y0(chartHeight)
         .y1(d => y(d.value))
-        .curve(d3.curveBasis);
+        .curve(d3.curveNatural);
 
       const gradient = svg
         .append('defs')
@@ -144,10 +144,85 @@ export default {
         .attr('class', 'area')
         .attr('d', area)
         .attr('fill', 'url(#svgGradient)');
+
+      svg.append('rect')
+        .attr('class', 'mask')
+        .attr('width', chartWidth)
+        .attr('height', chartHeight + margin.top + margin.bottom)
+        .attr('fill', '#ffffff')
+        .attr('x', 0)
+        .transition()
+        .duration(1000)
+        .attr('x', chartWidth);
+
+      const dot = g
+        .append('circle')
+        .attr('class', 'dot')
+        .attr('r', 5)
+        .attr('stroke', '#00BAB6 ')
+        .attr('stroke-width', 2)
+        .attr('fill', '#ffffff')
+        .attr('opacity', '0');
+
+      const messageWrapper = d3
+        .select(`#line-chart-${this.id}`)
+        .append('div')
+        .attr('class','line-message-wrapper')
+        .attr('id', `line-message-wrapper-${this.id}`)
+        .html('<div class="circle"></div><div class="data"></div>')
+        .attr('style', 'display: none;');
+
+      g.selectAll(`.line-hover-block-${this.id}`)
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('class', `line-hover-block-${this.id}`)
+        .attr('width', chartWidth / data.length)
+        .attr('height', chartHeight)
+        .attr('fill', 'transparent')
+        .attr('x', (d, i) => x(i) - (chartWidth / data.length / 2))
+        .on('mouseover', (d, i) => {
+          dot
+            .attr('cx', () => x(i))
+            .attr('cy', () => y(d.value))
+            .attr('opacity', 1);
+
+          d3.select(`#line-message-wrapper-${this.id} .data`).html(`${d.value}`);
+
+          messageWrapper.attr('style', () => `display: flex; left: ${x(i) + 15}px; top: ${y(d.value)}px`);
+        })
+        .on('mouseleave', () => {
+          dot.attr('opacity', 0);
+          messageWrapper.attr('style', 'display: none;');
+        });
     }
   }
 };
 </script>
 
 <style>
+.line-message-wrapper {
+  border-radius: 4px;
+  width: 76px;
+  height: 34px;
+  background: #ffffff;
+  box-shadow: 0 2px 9px 0 rgba(0, 0, 0, 0.09);
+  position: absolute;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.line-message-wrapper .circle {
+  border-radius: 50%;
+  height: 11px;
+  width: 11px;
+  background-color: #00bab6;
+}
+
+.line-message-wrapper .data {
+  font-size: 12px;
+  color: #7e7e7e;
+  margin-left: 10px;
+}
 </style>
