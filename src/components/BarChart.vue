@@ -7,7 +7,7 @@
 import * as d3 from 'd3';
 
 export default {
-  name: 'LineChart',
+  name: 'BarChart',
   data() {
     return {
       id: Date.now()
