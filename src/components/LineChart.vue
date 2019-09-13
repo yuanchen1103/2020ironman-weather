@@ -5,12 +5,26 @@
 
 <script>
 import * as d3 from 'd3';
+import shortid from 'shortid';
+
+const convertHex = (color) => {
+  if (color.substring(0, 1) == '#') {
+    color = color.substring(1);
+  }
+
+  /* Grab each pair (channel) of hex values and parse them to ints using hexadecimal decoding */
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4), 16);
+  return `rgba(${r}, ${g}, ${b}, 0.4)`;
+};
 
 export default {
+  props: ['color'],
   name: 'LineChart',
   data() {
     return {
-      id: Date.now()
+      id: shortid.generate()
     };
   },
   mounted() {
@@ -74,7 +88,7 @@ export default {
         left: 0,
         right: 0
       };
-      const chartWidth = 254 - margin.left - margin.right;
+      const chartWidth = 260 - margin.left - margin.right;
       const chartHeight = 88 - margin.top - margin.bottom;
 
       const x = d3
@@ -107,7 +121,7 @@ export default {
         .attr('d', line)
         .attr('fill', 'none')
         .attr('stroke-width', 2)
-        .attr('stroke', '#00BAB6');
+        .attr('stroke', this.color);
 
       const area = d3
         .area()
@@ -119,7 +133,7 @@ export default {
       const gradient = svg
         .append('defs')
         .append('linearGradient')
-        .attr('id', 'svgGradient')
+        .attr('id', `svgGradient-${this.id}`)
         .attr('x1', '50%')
         .attr('x2', '50%')
         .attr('y1', '0%')
@@ -129,7 +143,7 @@ export default {
         .append('stop')
         .attr('class', 'start')
         .attr('offset', '0%')
-        .attr('stop-color', 'rgba(0,186,182, 0.4)')
+        .attr('stop-color', () => convertHex(this.color))
         .attr('stop-opacity', 1);
 
       gradient
@@ -143,9 +157,10 @@ export default {
         .datum(data)
         .attr('class', 'area')
         .attr('d', area)
-        .attr('fill', 'url(#svgGradient)');
+        .attr('fill', `url(#svgGradient-${this.id})`);
 
-      svg.append('rect')
+      svg
+        .append('rect')
         .attr('class', 'mask')
         .attr('width', chartWidth)
         .attr('height', chartHeight + margin.top + margin.bottom)
@@ -159,7 +174,7 @@ export default {
         .append('circle')
         .attr('class', 'dot')
         .attr('r', 5)
-        .attr('stroke', '#00BAB6 ')
+        .attr('stroke', this.color)
         .attr('stroke-width', 2)
         .attr('fill', '#ffffff')
         .attr('opacity', '0');
@@ -167,9 +182,9 @@ export default {
       const messageWrapper = d3
         .select(`#line-chart-${this.id}`)
         .append('div')
-        .attr('class','line-message-wrapper')
+        .attr('class', 'line-message-wrapper')
         .attr('id', `line-message-wrapper-${this.id}`)
-        .html('<div class="circle"></div><div class="data"></div>')
+        .html(`<div class="circle" style="background: ${this.color}"></div><div class="data"></div>`)
         .attr('style', 'display: none;');
 
       g.selectAll(`.line-hover-block-${this.id}`)
@@ -180,7 +195,7 @@ export default {
         .attr('width', chartWidth / data.length)
         .attr('height', chartHeight)
         .attr('fill', 'transparent')
-        .attr('x', (d, i) => x(i) - (chartWidth / data.length / 2))
+        .attr('x', (d, i) => x(i) - chartWidth / data.length / 2)
         .on('mouseover', (d, i) => {
           dot
             .attr('cx', () => x(i))
@@ -211,13 +226,13 @@ export default {
   display: flex;
   align-items: center;
   padding-left: 15px;
+  z-index: 3;
 }
 
 .line-message-wrapper .circle {
   border-radius: 50%;
   height: 11px;
   width: 11px;
-  background-color: #00bab6;
 }
 
 .line-message-wrapper .data {
