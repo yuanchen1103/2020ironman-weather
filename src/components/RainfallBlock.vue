@@ -3,7 +3,8 @@
     <h1 class="title">
       Rainfall History
     </h1>
-    <BarChart style="margin-top: 20px"/>
+    <BarChart style="margin-top: 20px"
+              :chartData="chartData" />
   </div>
 </template>
 
@@ -11,6 +12,7 @@
 import BarChart from './BarChart';
 
 export default {
+  props: ['chartData'],
   name: 'RainfallBlock',
   components: {
     BarChart

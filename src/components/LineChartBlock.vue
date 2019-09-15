@@ -4,7 +4,7 @@
       <div style="margin-left: 32px;">
         <h1 class="avg-data"
             :style="{color}">
-          24.5
+          {{avg}}
         </h1>
         <p class="title">{{title}}</p>
       </div>
@@ -15,7 +15,8 @@
       </div>
     </div>
     <LineChart :color="color"
-               style="margin-bottom: 25px; margin-top: 63px;" />
+               style="margin-bottom: 25px; margin-top: 63px;"
+               :chartData="chartData" />
   </div>
 </template>
 
@@ -23,7 +24,7 @@
 import LineChart from './LineChart';
 
 export default {
-  props: ['title', 'color', 'icon'],
+  props: ['title', 'color', 'icon', 'chartData', 'avg'],
   name: 'LineChartBlock',
   components: {
     LineChart

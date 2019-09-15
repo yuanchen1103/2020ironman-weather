@@ -7,6 +7,7 @@
 import * as d3 from 'd3';
 
 export default {
+  props: ['chartData'],
   name: 'BarChart',
   data() {
     return {
@@ -18,57 +19,8 @@ export default {
   },
   methods: {
     drawChart() {
-      const data = [
-        {
-          value: 10,
-          name: '18:35'
-        },
-        {
-          value: 12,
-          name: '18:55'
-        },
-        {
-          value: 0,
-          name: '19:15'
-        },
-        {
-          value: 3,
-          name: '19:35'
-        },
-        {
-          value: 18,
-          name: '19:55'
-        },
-        {
-          value: 0,
-          name: '20:15'
-        },
-        {
-          value: 5,
-          name: '20:35'
-        },
-        {
-          value: 9,
-          name: '20:55'
-        },
-        {
-          value: 5,
-          name: '21:15'
-        },
-        {
-          value: 4,
-          name: '21:35'
-        },
-        {
-          value: 16,
-          name: '21:55'
-        },
-        {
-          value: 8,
-          name: '22:15'
-        }
-      ];
-
+      const data = this.chartData;
+      const isAllZero = data.every(e => e.value === 0);
       const margin = {
         top: 20,
         bottom: 20,
@@ -118,7 +70,7 @@ export default {
         .duration(750)
         .delay((d, i) => i * 30)
         .ease(d3.easeCubic)
-        .attr('height', d => chartHeight - y(d.value))
+        .attr('height', d => isAllZero ? 0 : chartHeight - y(d.value))
         .attr('y', d => y(d.value));
 
       g.selectAll('.label')

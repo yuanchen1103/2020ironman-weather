@@ -7,12 +7,12 @@
       <div class="group">
         <img :src="sunriseImg"
              alt="">
-        <h5 class="data">06:32</h5>
+        <h5 class="data">{{sunrise}}</h5>
       </div>
       <div class="group">
         <img :src="sunsetImg"
              alt="">
-        <h5 class="data">17:08</h5>
+        <h5 class="data">{{sunset}}</h5>
       </div>
     </div>
   </div>
@@ -23,6 +23,7 @@ import sunsetImg from '../assets/img/sunset.svg';
 import sunriseImg from '../assets/img/sunrise.svg';
 
 export default {
+  props: ['sunset', 'sunrise'],
   name: 'SunBlock',
   data() {
     return {

@@ -20,7 +20,7 @@ const convertHex = (color) => {
 };
 
 export default {
-  props: ['color'],
+  props: ['color', 'chartData'],
   name: 'LineChart',
   data() {
     return {
@@ -32,56 +32,8 @@ export default {
   },
   methods: {
     drawChart() {
-      const data = [
-        {
-          value: 10,
-          name: '18:35'
-        },
-        {
-          value: 12,
-          name: '18:55'
-        },
-        {
-          value: 0,
-          name: '19:15'
-        },
-        {
-          value: 3,
-          name: '19:35'
-        },
-        {
-          value: 18,
-          name: '19:55'
-        },
-        {
-          value: 0,
-          name: '20:15'
-        },
-        {
-          value: 5,
-          name: '20:35'
-        },
-        {
-          value: 9,
-          name: '20:55'
-        },
-        {
-          value: 5,
-          name: '21:15'
-        },
-        {
-          value: 4,
-          name: '21:35'
-        },
-        {
-          value: 16,
-          name: '21:55'
-        },
-        {
-          value: 8,
-          name: '22:15'
-        }
-      ];
+      const data = this.chartData;
+      
       const margin = {
         top: 20,
         bottom: 20,
@@ -98,7 +50,7 @@ export default {
 
       const y = d3
         .scaleLinear()
-        .domain([0, d3.max(data.map(e => e.value))])
+        .domain([d3.min(data.map(e => e.value)), d3.max(data.map(e => e.value))])
         .range([chartHeight, 0]);
 
       const svg = d3
